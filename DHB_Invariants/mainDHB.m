@@ -34,7 +34,7 @@ end
 
                                  
 %% Compute velocity based DHB invariants
-[m_v, theta_v_1, theta_v_2, m_w, theta_w_1, theta_w_2, Hv0, Hw0] = computeDHB(twists(:,4:6), twists(:,1:3));
+[m_v, theta_v_1, theta_v_2, m_w, theta_w_1, theta_w_2, Hv0, Hw0] = computeDHB(twists(:,4:6), twists(:,1:3), 'vel');
 invariants = [m_v, theta_v_1, theta_v_2, m_w, theta_w_1, theta_w_2];
 
 %% Plot invariant trajectories
