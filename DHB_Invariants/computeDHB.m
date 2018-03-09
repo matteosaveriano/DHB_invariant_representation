@@ -1,4 +1,4 @@
-%% Functions to impement the Denavit–Hartenberg inspired Bidirectional (DHB) invariant representation
+%% Functions that implement the Denavit–Hartenberg inspired Bidirectional (DHB) invariant representation
 % See: D. Lee, R. Soloperto, and M. Saveriano, "Bidirectional invariant
 %      representation of rigid body motions and its application to gesture
 %      recognition and reproduction", Auton. Robots, 42(1):125–145, 2018.
