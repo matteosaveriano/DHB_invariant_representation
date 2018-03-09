@@ -1,72 +1,78 @@
-%% Functions to impement the velocity-based Denavit–Hartenberg inspired Bidirectional (DHB) invariant representation
+%% Functions to impement the Denavit–Hartenberg inspired Bidirectional (DHB) invariant representation
 % See: D. Lee, R. Soloperto, and M. Saveriano, "Bidirectional invariant
 %      representation of rigid body motions and its application to gesture
 %      recognition and reproduction", Auton. Robots, 42(1):125–145, 2018.
 
-%% Compute DHB invariants (velocity-based)
-% Input: v -> linear velocity (Nx3 array) 
-%        w -> angular velocity (Nx3 array)
+%% Compute DHB invariants (position- or velocity-based)
+% Input: p -> position difference or linear velocity (Nx3 array) 
+%        theta -> rotation vector difference or angular velocity (Nx3 array)
+%        method -> 'pos': poisiton-based DHB, 'vel': velocity-based DHB
+%        pose0 -> initial pose (used only if method='pos')
+% 
+% Output: m_p       -> first linear (position or velocity) invariant (N-2 array)
+%         theta_p_1 -> second linear (position or velocity) invariant (N-2 array)
+%         theta_p_2 -> third linear (position or velocity) invariant (N-2 array)
 %
-% Output: m_v       -> first linear velocity invariant (N-2 array)
-%         theta_v_1 -> second linear velocity invariant (N-2 array)
-%         theta_v_2 -> third linear velocity invariant (N-2 array)
+%         m_r       -> first angular (position or velocity) invariant (N-2 array)
+%         theta_r_1 -> second angular (position or velocity) invariant (N-2 array)
+%         theta_r_2 -> third angular (position or velocity) invariant (N-2 array)
 %
-%         m_w       -> first angular velocity invariant (N-2 array)
-%         theta_w_1 -> second angular velocity invariant (N-2 array)
-%         theta_w_2 -> third angular velocity invariant (N-2 array)
-%
-%         H_v -> Initial linear frame
-%         H_w -> Initial angular frame
+%         H_p -> Initial linear frame
+%         H_r -> Initial angular frame
 
-function [m_v, theta_v_1, theta_v_2, m_w, theta_w_1, theta_w_2, H_v, H_w] = computeDHB(v, w)
+function [m_p, theta_p_1, theta_p_2, m_r, theta_r_1, theta_r_2, H_p, H_r] = computeDHB(p, theta, method, pose0)
 
-[loop_iter, ~] = size(v);
+[loop_iter, ~] = size(theta);
 
 % Compute frames
-P_ex = c_ex(v(1,:), [1 0 0]);
-P_ex2 = c_ex(v(2,:), P_ex);
+P_ex = c_ex(p(1,:), [1 0 0]);
+P_ex2 = c_ex(p(2,:), P_ex);
 P_ey = c_ey(P_ex, P_ex2, [P_ex(2)-P_ex(3) P_ex(3)-P_ex(1) P_ex(1)-P_ex(2)]/norm([P_ex(2)-P_ex(3) P_ex(3)-P_ex(1) P_ex(1)-P_ex(2)]));
 P_ez = cross(P_ex,P_ey);
 if norm(P_ez) > 1e-10
     P_ez = P_ez/norm(P_ez);
 end
 
-H_v = eye(4);
-H_v(1:3,1:3) = ([P_ex', P_ey', P_ez' ]);
-H_v(1:3,4) = v(1,:);
+H_p = eye(4);
+H_p(1:3,1:3) = ([P_ex', P_ey', P_ez' ]);
+if(strcmp(method, 'pos'))
+    H_p(1:3,4) = pose0(1:3);
+else
+    H_p(1:3,4) = p(1,:);
+end
 
-T_ex = c_ex(w(1,:), [1 0 0]);
-T_ex2 = c_ex(w(2,:), T_ex);
+T_ex = c_ex(theta(1,:), [1 0 0]);
+T_ex2 = c_ex(theta(2,:), T_ex);
 T_ey = c_ey(T_ex, T_ex2, [0 1 0]);
 T_ez = cross(T_ex,T_ey);
 if norm(T_ez) > 1e-10
     T_ez = T_ez/norm(T_ez);
 end
 
-H_w = eye(3);
-H_w(1:3,1:3) = ([T_ex', T_ey', T_ez' ]);
+H_r = eye(3);
+H_r(1:3,1:3) = ([T_ex', T_ey', T_ez' ]);
 
-m_v = zeros(loop_iter-2,1);
-theta_v_1 = zeros(loop_iter-2,1);
-theta_v_2 = zeros(loop_iter-2,1);
+m_p = zeros(loop_iter-2,1);
+theta_p_1 = zeros(loop_iter-2,1);
+theta_p_2 = zeros(loop_iter-2,1);
 
-m_w = zeros(loop_iter-2,1);
-theta_w_1 = zeros(loop_iter-2,1);
-theta_w_2 = zeros(loop_iter-2,1);
+m_r = zeros(loop_iter-2,1);
+theta_r_1 = zeros(loop_iter-2,1);
+theta_r_2 = zeros(loop_iter-2,1);
 
 % Compute invariant values
 for i = 1:loop_iter-2  
-    P_ex3 = c_ex(v(i+2,:), P_ex2);
+    P_ex3 = c_ex(p(i+2,:), P_ex2);
     P_ey2 = c_ey(P_ex2, P_ex3, P_ey);
-    [m_v(i,1), theta_v_1(i,1), theta_v_2(i,1)] = c_values(v(i,:), P_ex, P_ex2, P_ey, P_ey2);
+    [m_p(i,1), theta_p_1(i,1), theta_p_2(i,1)] = c_values(p(i,:), P_ex, P_ex2, P_ey, P_ey2);
     
     P_ex = P_ex2;
     P_ex2 = P_ex3;
     P_ey = P_ey2;
 
-    T_ex3 = c_ex(w(i+2,:), T_ex2);
+    T_ex3 = c_ex(theta(i+2,:), T_ex2);
     T_ey2 = c_ey(T_ex2, T_ex3, T_ey);
-    [m_w(i,1), theta_w_1(i,1), theta_w_2(i,1)] = c_values(w(i,:), T_ex, T_ex2, T_ey, T_ey2);
+    [m_r(i,1), theta_r_1(i,1), theta_r_2(i,1)] = c_values(theta(i,:), T_ex, T_ex2, T_ey, T_ey2);
     
     T_ex = T_ex2;
     T_ex2 = T_ex3;
