@@ -14,7 +14,7 @@ The code is developed and tested under _Ubuntu 14.04_ and _Matlab 2015b_.
 ## Usage
 We prepared a simple demo in ```mainDHB.m``` to show how a Cartesian 6D trajectory is transformed into a set of DHB invariants and vice versa.
 
-## Reference
+## References
 Please acknowledge the authors in any acedemic publication that used parts of these codes.
 ```
 @article{Lee2018,
