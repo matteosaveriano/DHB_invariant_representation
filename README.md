@@ -6,7 +6,7 @@ The folder _DHB_Invariants_ contains 3 scripts:
 - ```reconstructTrajectory.m```: Reconstruct a Cartesian trajectory from its DHB invariant representation.
 - ```mainDHB.m```: Simple demo script.
 
-The code is compatoble with Matlab and Octave.
+The code is compatible with Matlab and Octave.
 
 ## Software Requirements
 The code is developed and tested under _Matlab 2015b_.
