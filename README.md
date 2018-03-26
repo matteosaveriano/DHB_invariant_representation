@@ -6,10 +6,10 @@ The folder _DHB_Invariants_ contains 3 scripts:
 - ```reconstructTrajectory.m```: Reconstruct a Cartesian trajectory from its DHB invariant representation.
 - ```mainDHB.m```: Simple demo script.
 
-The code is written in C++ and organized into ROS (Robotic Operating System) nodes.
+The code is compatoble with Matlab and Octave.
 
 ## Software Requirements
-The code is developed and tested under _Ubuntu 14.04_ and _Matlab 2015b_.
+The code is developed and tested under _Matlab 2015b_.
 
 ## Usage
 We prepared a simple demo in ```mainDHB.m``` to show how a Cartesian 6D trajectory is transformed into a set of DHB invariants and vice versa.
